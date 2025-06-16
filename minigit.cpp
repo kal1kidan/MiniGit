@@ -6,6 +6,8 @@
 #include <sstream>
 using namespace std;
 namespace fs = std::filesystem;
+
+//Generate a simple hash from a string (used for file content add commits)
 string simpleHash(const string& content){
     unsigned long hash = 5381;
     for (char c : content){
@@ -13,6 +15,7 @@ string simpleHash(const string& content){
     }
     return to_string(hash);
 }
+//Initialize a new MiniGit repository with required folders and files
 void initMiniGit(){
     if(!fs::exists(".minigit")){
     if (!fs::create_directory(".minigit")){
@@ -48,6 +51,7 @@ void initMiniGit(){
     }else{
          cout << "Note: .minigit/refs/heads directory already exists." << endl;
     }
+    
     ofstream headFile(".minigit/HEAD");
     if (!headFile.is_open()){
         cout << "Error: Failed to create .minigit/HEAD file." << endl;
@@ -63,6 +67,7 @@ void initMiniGit(){
     mainBranch.close();
     cout << "Initialized empty MiniGit repository in .minigit/" << endl;
 }
+//stage a file by hashing its content and storing it in objects
 void addFile(const string& filename){
     cout << "Attempting to add file: " << filename << endl;
     ifstream file(filename);
@@ -121,6 +126,7 @@ cout << "File" << filename <<" already in staging area with hash" << hash << "."
 cout << "Added" << filename << " to staging area." <<endl;
 }
 
+//create a commit from staged files, store in objects, and update branch reference
 void commit(const string& message){
 if(!fs::exists(".minigit/index")) {
 cout << " Error: Nothing to commit, staging area is empt. " << endl;
@@ -159,6 +165,7 @@ fs::remove(".minigit/index");
 cout << "Committed with hash" << commitHash <<": "<< message << endl; 
 }
 
+//show the latest commit and its message
 void log() {
 if (!fs::exists(".minigit/refs/heads/main")) {
 cout << "Error: No commits found." << endl;
@@ -198,6 +205,7 @@ cout << "commit " << commitHash << endl;
 cout << "   " << message << endl;
 }
 
+//ceate a new branch pointing to the lastest commit
 void branch (const string& branchName) {
 //Check if branch already exists
 string branchPath = ".minigit/refs/heads/" + branchName;
@@ -235,6 +243,7 @@ branchFile.close();
 
 cout << "Created branch " << branchName << "." << endl;
 }
+
 int main(int argc, char* argv[]){if (argc < 2){
         cout << "Usage: minigit <command>" <<endl;
         return 1;
