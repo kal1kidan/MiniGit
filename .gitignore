@@ -1,0 +1,7 @@
+# Ignore compiled executables
+minigit.exe
+# Ignore MiniGit's own repository folder
+.minigit/
+# Ignore temporary files
+*.o
+*.obj
