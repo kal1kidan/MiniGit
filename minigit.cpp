@@ -243,7 +243,21 @@ branchFile.close();
 
 cout << "Created branch " << branchName << "." << endl;
 }
-
+void checkout(const std::string& branchName){
+    string branchPath = ".minigit/refs/heads/" + branchName;
+    if(!fs::exists(branchPath)){
+        cout<< "Error:Branch" << branchName <<" does not exist." <<endl;
+        return;
+    
+}
+    ofstream headFile(".minigit/HEAD");
+    if(!headFile.is_open()){
+        cout<<"Error:Failed to update .minigit/HEAD."<<endl;
+        return;
+    }
+    headFile <<"refs/heads/" << branchName;
+    headFile.close();
+    cout<<"Switched to branch"<< branchName <<"."<<endl;}
 int main(int argc, char* argv[]){if (argc < 2){
         cout << "Usage: minigit <command>" <<endl;
         return 1;
@@ -253,14 +267,16 @@ int main(int argc, char* argv[]){if (argc < 2){
         initMiniGit();
     }else if(command == "add" && argc == 3){
         addFile(argv[2]);
-    } else if(command == "commit" && argc == 3){
+    }else if(command == "commit" && argc == 3){
         commit(argv[2]);
-    }  else if(command == "log" && argc == 2){
+    }else if(command == "log" && argc == 2){
         log();
+    }else if (command == "checkout" && argc == 3){
+        checkout(argv[2]);
     }else if(command == "branch" && argc == 3){
         branch(argv[2]);
     }
-     else{
+    else{
         cout << "Unknown command: " << command << endl;
         return 1;
     }
