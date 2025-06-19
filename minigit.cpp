@@ -258,6 +258,72 @@ void checkout(const std::string& branchName){
     headFile <<"refs/heads/" << branchName;
     headFile.close();
     cout<<"Switched to branch"<< branchName <<"."<<endl;}
+    void diff (const string& filename){
+    ifstream file(filename);
+    if (!file.is_open()){
+        cout << "Error: File " << filename << " not found." << endl;
+        return;
+    }
+    stringstream buffer;
+    buffer << file.rdbuf();
+    string currentContent = buffer.str();
+    file.close();
+    
+    if (!fs::exists(".minigit/index")){
+        cout << "No staged changes for " << filename << "." << endl;
+        return;
+    }
+    ifstream indexFile(".minigit/index");
+    string line;
+    string stagedHash;
+    while (getline(indexFile, line)){
+        stringstream ss(line);
+        string indexedFile, hash;
+        ss >> indexedFile >> hash;
+        if (indexedFile == filename) {
+            stagedHash = hash;
+            break;
+        }
+    }
+    indexFile.close();
+    if (stagedHash.empty()) {
+        cout << "File " << filename << " not staged. " << endl;
+        return;
+    }
+    string stagedPath = ".minigit/objects/" + stagedHash;
+    ifstream stagedFile(stagedPath);
+    if (!stagedFile.is_open()) {
+        cout << "Error: Staged version of " << filename << " not found." << endl;
+        return;
+    }
+    buffer.str("");
+    buffer << stagedFile.rdbuf();
+    string stagedContent = buffer.str();
+    stagedFile.close();
+    
+    istringstream currentStream(currentContent);
+    istringstream stagedStream(stagedContent);
+    string currentLine, stagedLine;
+    bool differ = false;
+    while (getline(currentStream, currentLine) || getline(stagedStream, stagedLine)){
+        if(currentLine != stagedLine){
+        if (currentLine.empty()){
+            cout << "-" << stagedLine << endl;
+        } else if(stagedLine.empty()){
+            cout << "+" << currentLine << endl;
+        } else {
+            cout << "-" << stagedLine << endl;
+            cout << "+" << currentLine << endl;
+        }
+        differ = true;
+    }else if (!currentLine.empty()){
+        cout << "  " << currentLine << endl;
+    }
+}
+if (!differ) {
+    cout << "No differences found between " << filename << " and its staged version." << endl;
+}
+    }
 int main(int argc, char* argv[]){if (argc < 2){
         cout << "Usage: minigit <command>" <<endl;
         return 1;
@@ -275,8 +341,9 @@ int main(int argc, char* argv[]){if (argc < 2){
         checkout(argv[2]);
     }else if(command == "branch" && argc == 3){
         branch(argv[2]);
-    }
-    else{
+    }else if (command == "diff" && argc == 3) {
+    diff(argv[2]);
+    }else{
         cout << "Unknown command: " << command << endl;
         return 1;
     }
