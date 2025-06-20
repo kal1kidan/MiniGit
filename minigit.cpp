@@ -302,6 +302,7 @@ void branch(const string &branchName)
 
     cout << "Created branch " << branchName << "." << endl;
 }
+
 // Switches to the specified branch by updating the HEAD reference
 void checkout(const std::string &branchName)
 {
@@ -321,6 +322,7 @@ void checkout(const std::string &branchName)
     headFile.close();
     cout << "Switched to branch" << branchName << "." << endl;
 }
+
 // Shows line-by-line differences between a file and its staged version
 void diff(const string &filename)
 {
@@ -335,6 +337,7 @@ void diff(const string &filename)
     string currentContent = buffer.str();
     file.close();
 
+    // if it doesn't exists
     if (!fs::exists(".minigit/index"))
     {
         cout << "No staged changes for " << filename << "." << endl;
@@ -375,6 +378,7 @@ void diff(const string &filename)
     istringstream currentStream(currentContent);
     istringstream stagedStream(stagedContent);
     string currentLine, stagedLine;
+    
     bool differ = false;
     while (getline(currentStream, currentLine) || getline(stagedStream, stagedLine))
     {
