@@ -324,6 +324,54 @@ if (!differ) {
     cout << "No differences found between " << filename << " and its staged version." << endl;
 }
     }
+    void merge(const string& sourceBranch, const string& targetBranch) {
+    string sourcePath = ".minigit/refs/heads/" + sourceBranch;
+    string targetPath = ".minigit/refs/heads/" + targetBranch;
+
+    // Check if source branch exists
+    if (!fs::exists(sourcePath)) {
+        cout << "Error: Source branch " << sourceBranch << " does not exist." << endl;
+        return;
+    }
+
+    // Check if target branch exists
+    if (!fs::exists(targetPath)) {
+        cout << "Error: Target branch " << targetBranch << " does not exist." << endl;
+        return;
+    }
+
+    // Read source branch's commit hash
+    ifstream sourceFile(sourcePath);
+    string sourceCommit;
+    getline(sourceFile, sourceCommit);
+    sourceFile.close();
+
+    // Update target branch with source commit hash
+    ofstream targetFile(targetPath);
+    if (!targetFile.is_open()) {
+        cout << "Error: Failed to update " << targetPath << "." << endl;
+        return;
+    }
+    targetFile << sourceCommit;
+    targetFile.close();
+
+    // Update HEAD if target branch is currently checked out
+    ifstream headFile(".minigit/HEAD");
+    string currentBranch;
+    getline(headFile, currentBranch);
+    headFile.close();
+    if (currentBranch == "refs/heads/" + targetBranch) {
+        ofstream headUpdate(".minigit/HEAD");
+        if (!headUpdate.is_open()) {
+            cout << "Error: Failed to update .minigit/HEAD." << endl;
+            return;
+        }
+        headUpdate << currentBranch;
+        headUpdate.close();
+    }
+
+    cout << "Merged " << sourceBranch << " into " << targetBranch << "." << endl;
+}
 int main(int argc, char* argv[]){if (argc < 2){
         cout << "Usage: minigit <command>" <<endl;
         return 1;
@@ -343,7 +391,11 @@ int main(int argc, char* argv[]){if (argc < 2){
         branch(argv[2]);
     }else if (command == "diff" && argc == 3) {
     diff(argv[2]);
-    }else{
+    }
+    else if (command =="merge" && argc==4){
+        merge(argv[2], argv[3]);
+    }
+    else{
         cout << "Unknown command: " << command << endl;
         return 1;
     }
