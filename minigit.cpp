@@ -243,6 +243,7 @@ branchFile.close();
 
 cout << "Created branch " << branchName << "." << endl;
 }
+// Switches to the specified branch by updating the HEAD reference
 void checkout(const std::string& branchName){
     string branchPath = ".minigit/refs/heads/" + branchName;
     if(!fs::exists(branchPath)){
@@ -258,6 +259,7 @@ void checkout(const std::string& branchName){
     headFile <<"refs/heads/" << branchName;
     headFile.close();
     cout<<"Switched to branch"<< branchName <<"."<<endl;}
+    // Shows line-by-line differences between a file and its staged version
     void diff (const string& filename){
     ifstream file(filename);
     if (!file.is_open()){
@@ -324,6 +326,7 @@ if (!differ) {
     cout << "No differences found between " << filename << " and its staged version." << endl;
 }
     }
+    // Merges the source branch into the target branch by updating its commit hash.
     void merge(const string& sourceBranch, const string& targetBranch) {
     string sourcePath = ".minigit/refs/heads/" + sourceBranch;
     string targetPath = ".minigit/refs/heads/" + targetBranch;
@@ -372,6 +375,7 @@ if (!differ) {
 
     cout << "Merged " << sourceBranch << " into " << targetBranch << "." << endl;
 }
+// Parses and executes MiniGit commands from command-line arguments.
 int main(int argc, char* argv[]){if (argc < 2){
         cout << "Usage: minigit <command>" <<endl;
         return 1;
@@ -392,10 +396,9 @@ int main(int argc, char* argv[]){if (argc < 2){
     }else if (command == "diff" && argc == 3) {
     diff(argv[2]);
     }
-    else if (command =="merge" && argc==4){
-        merge(argv[2], argv[3]);
-    }
-    else{
+    else if (command == "merge" && argc == 5 && string(argv[2]) == "-b"){
+        merge(argv[4], argv[3]); 
+    }else{
         cout << "Unknown command: " << command << endl;
         return 1;
     }
