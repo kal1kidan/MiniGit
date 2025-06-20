@@ -16,6 +16,7 @@ string simpleHash(const string& content){
     return to_string(hash);
 }
 //Initialize a new MiniGit repository with required folders and files
+// 
 void initMiniGit(){
     if(!fs::exists(".minigit")){
     if (!fs::create_directory(".minigit")){
@@ -375,6 +376,8 @@ if (!differ) {
 
     cout << "Merged " << sourceBranch << " into " << targetBranch << "." << endl;
 }
+
+// main should be re optimized
 // Parses and executes MiniGit commands from command-line arguments.
 int main(int argc, char* argv[]){if (argc < 2){
         cout << "Usage: minigit <command>" <<endl;
