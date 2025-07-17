@@ -6,7 +6,9 @@
 #include <sstream>
 using namespace std;
 namespace fs = std::filesystem;
-
+// MiniGit commit hash function
+// Created and maintained by Ruhama Beshada,sifen fikru and kalkidan asdesach
+// This function generates a simple deterministic hash to identify commits based
 // Generate a simple hash from a string (used for file content add commits)
 string simpleHash(const string &content)
 {
